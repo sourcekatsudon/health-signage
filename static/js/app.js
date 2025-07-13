@@ -25,10 +25,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 表示日数スライダー
     const daysSlider = document.getElementById('daysSlider');
-    const daysValue = document.getElementById('daysValue');
     daysSlider.addEventListener('input', function() {
         displayDays = parseInt(this.value);
         const weeks = displayDays / 7;
+        const daysValue = document.getElementById('daysValue');
         daysValue.textContent = displayDays;
         daysValue.parentNode.innerHTML = `表示期間: <span id="daysValue">${displayDays}</span>日 (${weeks}週間)`;
         loadCharts();
