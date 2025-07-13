@@ -128,9 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Database files
-*.db
-mood.db
+# Database files (excluding mood.db for initial setup)
+# *.db
+# mood.db
 
 # IDE
 .vscode/
