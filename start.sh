@@ -8,5 +8,5 @@ source venv/bin/activate
 
 # Start the application
 echo "アプリケーションを起動しています..."
-echo "ブラウザで http://localhost:5000 にアクセスしてください"
+echo "ブラウザで http://localhost:5001 にアクセスしてください"
 python app.py
