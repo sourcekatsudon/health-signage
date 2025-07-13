@@ -4,7 +4,8 @@ let currentData = {
     creative_hours: 0,
     meal_count: 0,
     exercise_minutes: 0,
-    took_medicine: 0
+    took_medicine: 0,
+    took_sleep_medicine: 0
 };
 
 let charts = {
@@ -99,6 +100,16 @@ function initializeInputs() {
             saveData();
         });
     });
+
+    // 睡眠薬ボタン
+    document.querySelectorAll('.mini-medicine-button').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.mini-medicine-button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentData.took_sleep_medicine = parseInt(this.dataset.value);
+            saveData();
+        });
+    });
 }
 
 // データ保存
@@ -157,6 +168,11 @@ async function loadCharts() {
             return entry ? entry.sleep_hours : null;
         });
         
+        const sleepMedicineData = dates.map(date => {
+            const entry = entryMap[date];
+            return entry ? entry.took_sleep_medicine : null;
+        });
+        
         const creativeData = dates.map(date => {
             const entry = entryMap[date];
             return entry ? entry.creative_hours : null;
@@ -172,7 +188,7 @@ async function loadCharts() {
             return entry ? entry.exercise_minutes : null;
         });
         
-        drawMoodChart(labels, moodData, sleepData);
+        drawMoodChart(labels, moodData, sleepData, sleepMedicineData);
         drawCreativeChart(labels, creativeData);
         drawMealChart(labels, mealData);
         drawExerciseChart(labels, exerciseData);
@@ -183,12 +199,18 @@ async function loadCharts() {
 }
 
 // 気分＋睡眠時間チャート
-function drawMoodChart(labels, moodData, sleepData) {
+function drawMoodChart(labels, moodData, sleepData, sleepMedicineData) {
     const ctx = document.getElementById('moodChart').getContext('2d');
     
     if (charts.mood) {
         charts.mood.destroy();
     }
+    
+    // 睡眠薬服用に応じてポイントの色を変更
+    const sleepPointColors = sleepData.map((value, index) => {
+        if (value === null) return 'rgba(156, 163, 175, 0.5)'; // データなし
+        return sleepMedicineData[index] === 1 ? '#ef4444' : '#3b82f6'; // 赤=服用、青=未服用
+    });
     
     charts.mood = new Chart(ctx, {
         type: 'line',
@@ -213,8 +235,10 @@ function drawMoodChart(labels, moodData, sleepData) {
                     borderColor: 'rgba(59, 130, 246, 0.5)',
                     backgroundColor: 'rgba(59, 130, 246, 0.05)',
                     tension: 0.3,
-                    pointRadius: 2,
-                    pointHoverRadius: 4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: sleepPointColors,
+                    pointBorderColor: sleepPointColors,
                     borderWidth: 1,
                     fill: false,
                     yAxisID: 'sleep'
@@ -236,6 +260,11 @@ function drawMoodChart(labels, moodData, sleepData) {
                             if (context.dataset.label === '気分') {
                                 const moodLabels = ['', '死にたい', '悪い', '普通', 'まぁよい', '良い'];
                                 return moodLabels[context.parsed.y] || '';
+                            }
+                            if (context.dataset.label === '睡眠時間') {
+                                const index = context.dataIndex;
+                                const tookSleepMedicine = sleepMedicineData[index];
+                                return tookSleepMedicine === 1 ? '睡眠薬: 服用' : '睡眠薬: 未服用';
                             }
                             return '';
                         }

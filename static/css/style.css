@@ -161,8 +161,10 @@ body {
     color: white;
 }
 
-.mood-button i {
-    font-size: 16px;
+.mood-emoji {
+    font-size: 20px;
+    display: block;
+    margin-bottom: 2px;
 }
 
 .slider {
@@ -277,6 +279,54 @@ body {
 }
 
 .medicine-button.active[data-value="0"] {
+    border-color: #ef4444;
+    background: #ef4444;
+    color: white;
+}
+
+.sleep-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.sleep-medicine-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.medicine-label {
+    font-size: 11px;
+    color: #6b7280;
+    margin-right: 4px;
+}
+
+.mini-medicine-button {
+    padding: 5px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 40px;
+}
+
+.mini-medicine-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mini-medicine-button.active[data-value="1"] {
+    border-color: #10b981;
+    background: #10b981;
+    color: white;
+}
+
+.mini-medicine-button.active[data-value="0"] {
     border-color: #ef4444;
     background: #ef4444;
     color: white;

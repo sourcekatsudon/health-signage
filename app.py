@@ -20,6 +20,7 @@ def init_db():
             meal_count INTEGER DEFAULT 0,
             exercise_minutes INTEGER DEFAULT 0,
             took_medicine INTEGER DEFAULT 0,
+            took_sleep_medicine INTEGER DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
@@ -57,7 +58,8 @@ def get_entries():
             'creative_hours': row[4],
             'meal_count': row[5],
             'exercise_minutes': row[6],
-            'took_medicine': row[7]
+            'took_medicine': row[7],
+            'took_sleep_medicine': row[8]
         })
     
     conn.close()
@@ -73,8 +75,8 @@ def save_entry():
     
     cursor.execute('''
         INSERT OR REPLACE INTO mood_entries 
-        (date, mood, sleep_hours, creative_hours, meal_count, exercise_minutes, took_medicine, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        (date, mood, sleep_hours, creative_hours, meal_count, exercise_minutes, took_medicine, took_sleep_medicine, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     ''', (
         today,
         data.get('mood', 3),
@@ -82,7 +84,8 @@ def save_entry():
         data.get('creative_hours', 0),
         data.get('meal_count', 0),
         data.get('exercise_minutes', 0),
-        data.get('took_medicine', 0)
+        data.get('took_medicine', 0),
+        data.get('took_sleep_medicine', 0)
     ))
     
     conn.commit()
@@ -103,8 +106,8 @@ def generate_dummy_data():
         if random.random() > 0.2:  # 80%の確率でデータを生成
             cursor.execute('''
                 INSERT OR REPLACE INTO mood_entries 
-                (date, mood, sleep_hours, creative_hours, meal_count, exercise_minutes, took_medicine)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                (date, mood, sleep_hours, creative_hours, meal_count, exercise_minutes, took_medicine, took_sleep_medicine)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 current_date,
                 random.randint(1, 5),
@@ -112,6 +115,7 @@ def generate_dummy_data():
                 random.randint(0, 8),
                 random.randint(1, 5),
                 random.choice([0, 15, 30, 45, 60]),
+                random.randint(0, 1),
                 random.randint(0, 1)
             ))
         current_date += timedelta(days=1)

@@ -47,23 +47,23 @@
                 </div>
                 <div class="mood-buttons">
                     <button class="mood-button" data-value="5" data-color="#4ade80">
-                        <i class="fas fa-grin-stars"></i>
+                        <span class="mood-emoji">😊</span>
                         <span>良い</span>
                     </button>
                     <button class="mood-button" data-value="4" data-color="#86efac">
-                        <i class="fas fa-smile"></i>
+                        <span class="mood-emoji">🙂</span>
                         <span>まぁよい</span>
                     </button>
                     <button class="mood-button active" data-value="3" data-color="#fbbf24">
-                        <i class="fas fa-meh"></i>
+                        <span class="mood-emoji">😐</span>
                         <span>普通</span>
                     </button>
                     <button class="mood-button" data-value="2" data-color="#f87171">
-                        <i class="fas fa-frown"></i>
+                        <span class="mood-emoji">😔</span>
                         <span>悪い</span>
                     </button>
                     <button class="mood-button" data-value="1" data-color="#991b1b">
-                        <i class="fas fa-skull-crossbones"></i>
+                        <span class="mood-emoji">😞</span>
                         <span>死にたい</span>
                     </button>
                 </div>
@@ -71,9 +71,16 @@
 
             <!-- 睡眠時間 -->
             <div class="input-group">
-                <div class="input-header">
-                    <i class="fas fa-bed header-icon"></i>
-                    <h3>睡眠時間: <span id="sleepValue">7</span>時間</h3>
+                <div class="sleep-header">
+                    <div class="input-header">
+                        <i class="fas fa-bed header-icon"></i>
+                        <h3>睡眠時間: <span id="sleepValue">7</span>時間</h3>
+                    </div>
+                    <div class="sleep-medicine-buttons">
+                        <span class="medicine-label">睡眠薬:</span>
+                        <button class="mini-medicine-button" data-value="1">YES</button>
+                        <button class="mini-medicine-button active" data-value="0">NO</button>
+                    </div>
                 </div>
                 <input type="range" id="sleepSlider" min="2" max="16" value="7" class="slider">
                 <div class="slider-labels">
