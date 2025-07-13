@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>気分測定サイネージ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</head>
+<body>
+    <div class="app">
+        <div class="chart-section">
+            <div class="header-with-control">
+                <h2>気分と体調の推移</h2>
+                <div class="days-control">
+                    <label>表示期間: <span id="daysValue">14</span>日 (2週間)</label>
+                    <input type="range" id="daysSlider" min="7" max="84" step="7" value="14" class="days-slider">
+                </div>
+            </div>
+            
+            <!-- 気分グラフ（上部） -->
+            <div class="main-chart-container">
+                <canvas id="moodChart"></canvas>
+            </div>
+            
+            <!-- その他グラフ（下部） -->
+            <div class="sub-charts">
+                <div class="sub-chart">
+                    <canvas id="creativeChart"></canvas>
+                </div>
+                <div class="sub-chart">
+                    <canvas id="mealChart"></canvas>
+                </div>
+                <div class="sub-chart">
+                    <canvas id="exerciseChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-section">
+            <!-- 気分入力 -->
+            <div class="input-group">
+                <div class="input-header">
+                    <i class="fas fa-smile header-icon"></i>
+                    <h3>気分</h3>
+                </div>
+                <div class="mood-buttons">
+                    <button class="mood-button" data-value="5" data-color="#4ade80">
+                        <i class="fas fa-grin-stars"></i>
+                        <span>良い</span>
+                    </button>
+                    <button class="mood-button" data-value="4" data-color="#86efac">
+                        <i class="fas fa-smile"></i>
+                        <span>まぁよい</span>
+                    </button>
+                    <button class="mood-button active" data-value="3" data-color="#fbbf24">
+                        <i class="fas fa-meh"></i>
+                        <span>普通</span>
+                    </button>
+                    <button class="mood-button" data-value="2" data-color="#f87171">
+                        <i class="fas fa-frown"></i>
+                        <span>悪い</span>
+                    </button>
+                    <button class="mood-button" data-value="1" data-color="#991b1b">
+                        <i class="fas fa-skull-crossbones"></i>
+                        <span>死にたい</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 睡眠時間 -->
+            <div class="input-group">
+                <div class="input-header">
+                    <i class="fas fa-bed header-icon"></i>
+                    <h3>睡眠時間: <span id="sleepValue">7</span>時間</h3>
+                </div>
+                <input type="range" id="sleepSlider" min="2" max="16" value="7" class="slider">
+                <div class="slider-labels">
+                    <span>2h</span>
+                    <span>16h</span>
+                </div>
+            </div>
+
+            <!-- クリエイティブ時間 -->
+            <div class="input-group">
+                <div class="input-header">
+                    <i class="fas fa-palette header-icon"></i>
+                    <h3>クリエイティブ時間: <span id="creativeValue">0</span>時間</h3>
+                </div>
+                <input type="range" id="creativeSlider" min="0" max="10" value="0" class="slider">
+                <div class="slider-labels">
+                    <span>0h</span>
+                    <span>10h</span>
+                </div>
+            </div>
+
+            <!-- 食事回数＋薬 -->
+            <div class="input-group">
+                <div class="dual-inputs">
+                    <div class="dual-left">
+                        <div class="input-header">
+                            <i class="fas fa-utensils header-icon"></i>
+                            <h3>食事回数: <span id="mealValue">0</span>回</h3>
+                        </div>
+                        <div class="meal-buttons">
+                            <button class="meal-button active" data-value="0">0</button>
+                            <button class="meal-button" data-value="1">1</button>
+                            <button class="meal-button" data-value="2">2</button>
+                            <button class="meal-button" data-value="3">3</button>
+                            <button class="meal-button" data-value="4">4</button>
+                            <button class="meal-button" data-value="5">5</button>
+                        </div>
+                    </div>
+                    <div class="dual-right">
+                        <div class="input-header">
+                            <i class="fas fa-pills header-icon"></i>
+                            <h3>薬飲んだ？</h3>
+                        </div>
+                        <div class="medicine-buttons">
+                            <button class="medicine-button" data-value="1">YES</button>
+                            <button class="medicine-button active" data-value="0">NO</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 運動時間 -->
+            <div class="input-group">
+                <div class="input-header">
+                    <i class="fas fa-running header-icon"></i>
+                    <h3>運動時間: <span id="exerciseValue">0</span>分</h3>
+                </div>
+                <div class="exercise-buttons">
+                    <button class="exercise-button active" data-value="0">0分</button>
+                    <button class="exercise-button" data-value="15">15分</button>
+                    <button class="exercise-button" data-value="30">30分</button>
+                    <button class="exercise-button" data-value="45">45分</button>
+                    <button class="exercise-button" data-value="60">60分</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
