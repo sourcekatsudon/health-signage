@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {assess} from '../src/state.ts';
+import {selectSuggestions} from '../src/suggestions.ts';
+import {datesFor,shiftDate,validEntry,type Entry} from '../src/model.ts';
+const base:Entry={date:'2026-09-06',updatedAt:'2026-09-06T00:00:00.000Z',energy:3,mood:3,suicidalThought:0,moyamoya:0,realityHandling:3,workHours:2,hobbyHours:2};
+test('single low item and missing observations do not indicate decline',()=>{assert.equal(assess({...base,energy:1}).declining,false);assert.equal(assess({date:base.date,updatedAt:base.updatedAt}).points,0)});
+test('three signals and optional long sleep boundaries',()=>{const e={...base,energy:2,mood:2};assert.equal(assess(e).declining,false);assert.equal(assess({...e,sleepHours:10}).declining,true);assert.equal(assess({...e,sleepHours:9.99}).declining,false);assert.equal(assess({...base,moyamoya:3,realityHandling:2,workHours:.5,hobbyHours:.5}).points,3)});
+test('suicidal scale is independent even with incomplete other fields',()=>{for(let v=0;v<=4;v++){const s=assess({date:base.date,updatedAt:base.updatedAt,suicidalThought:v});assert.equal(s.watch,v>=1);assert.equal(s.high,v>=3)}});
+test('suggestions deterministic, limited, conditional and safe for all scale combinations',()=>{for(let energy=1;energy<=5;energy++)for(let mood=1;mood<=5;mood++)for(let suicidalThought=0;suicidalThought<=4;suicidalThought++)for(let moyamoya=0;moyamoya<=4;moyamoya++)for(let realityHandling=1;realityHandling<=5;realityHandling++){const e={...base,energy,mood,suicidalThought,moyamoya,realityHandling};const s=selectSuggestions(e);assert.deepEqual(s,selectSuggestions(e));assert.ok(s.length<=2);if(suicidalThought>=2)assert.ok(s.every(x=>!x.unsafe));if(suicidalThought>=3||!assess(e).declining)assert.equal(s.length,0)}});
+test('date windows cross month/year boundaries with exactly fourteen days',()=>{assert.equal(shiftDate('2026-01-01',-1),'2025-12-31');assert.equal(datesFor('2026-01-01').length,14);assert.equal(datesFor('2026-01-01')[0],'2025-12-19')});
+test('validation accepts half hours and missing data, rejects invalid ranges',()=>{assert.ok(validEntry({...base,workHours:15.5}));assert.ok(!validEntry({...base,date:'2026-02-30'}));assert.ok(!validEntry({...base,energy:0}));assert.ok(!validEntry({...base,workHours:1.25}));assert.ok(!validEntry({...base,mood:'3'}))});

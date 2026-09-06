@@ -147,3 +147,10 @@ dmypy.json
 .Trashes
 ehthumbs.db
 Thumbs.db
+# Private local configuration and health data
+.env.*
+!.env.example
+node_modules/
+health.db*
+static/js/app.js.map
+artifacts/

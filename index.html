@@ -1,160 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>気分測定サイネージ</title>
-    <link rel="stylesheet" href="./static/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>自宅健康管理サイネージ</title><link rel="stylesheet" href="/static/css/style.css"></head>
 <body>
-    <div class="app">
-        <div class="chart-section">
-            <div class="settings-container">
-                <button class="settings-button" id="settingsToggle" aria-label="設定を開く">
-                    <i class="fas fa-gear"></i>
-                </button>
-                <div class="settings-panel" id="settingsPanel">
-                    <div class="settings-panel-header">
-                        <span>データ設定</span>
-                        <button class="settings-close" id="settingsClose" aria-label="設定を閉じる">&times;</button>
-                    </div>
-                    <p class="settings-note">
-                        あなたの健康データは、このPCのこのブラウザにしか保存されていません（クラウドにはありません）。
-                        バックアップや他PCへ移行する場合は「エクスポート」で書き出し、「インポート」で読み込んでください。
-                    </p>
-                    <div class="settings-actions">
-                        <button class="ghost-button" id="exportDataButton">
-                            <i class="fas fa-file-export"></i> Export
-                        </button>
-                        <button class="ghost-button" id="importDataButton">
-                            <i class="fas fa-file-import"></i> Import
-                        </button>
-                        <input type="file" id="importFileInput" accept="application/json" hidden>
-                    </div>
-                </div>
-            </div>
-            <div class="header-with-control">
-                <h2>気分と生活の記録</h2>
-                <div class="days-control">
-                    <label>表示期間: <span id="daysValue">14</span>日 (2週間)</label>
-                    <input type="range" id="daysSlider" min="7" max="84" step="7" value="14" class="days-slider">
-                </div>
-            </div>
-            
-            <div class="main-chart-container">
-                <canvas id="moodChart"></canvas>
-            </div>
-        </div>
-        
-        <div class="input-section">
-            <div class="input-group">
-                <div class="input-header">
-                    <i class="fas fa-smile header-icon"></i>
-                    <h3>気分</h3>
-                </div>
-                <div class="mood-buttons">
-                    <button class="mood-button" data-value="5" data-color="#4ade80">
-                        <span class="mood-emoji">😀</span>
-                        <span>とても良い</span>
-                    </button>
-                    <button class="mood-button" data-value="4" data-color="#86efac">
-                        <span class="mood-emoji">🙂</span>
-                        <span>よい</span>
-                    </button>
-                    <button class="mood-button active" data-value="3" data-color="#fbbf24">
-                        <span class="mood-emoji">😐</span>
-                        <span>ふつう</span>
-                    </button>
-                    <button class="mood-button" data-value="2" data-color="#f87171">
-                        <span class="mood-emoji">🙁</span>
-                        <span>あまり</span>
-                    </button>
-                    <button class="mood-button" data-value="1" data-color="#991b1b">
-                        <span class="mood-emoji">😣</span>
-                        <span>とても悪い</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <div class="sleep-header">
-                    <div class="input-header">
-                        <i class="fas fa-bed header-icon"></i>
-                        <h3>睡眠時間: <span id="sleepValue">7</span>時間</h3>
-                    </div>
-                    <div class="sleep-medicine-buttons">
-                        <span class="medicine-label">睡眠薬:</span>
-                        <button class="mini-medicine-button" data-value="1">YES</button>
-                        <button class="mini-medicine-button active" data-value="0">NO</button>
-                    </div>
-                </div>
-                <input type="range" id="sleepSlider" min="2" max="16" value="7" class="slider">
-                <div class="slider-labels">
-                    <span>2h</span>
-                    <span>16h</span>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <div class="input-header">
-                    <i class="fas fa-palette header-icon"></i>
-                    <h3>クリエイティブ時間: <span id="creativeValue">0</span>時間</h3>
-                </div>
-                <input type="range" id="creativeSlider" min="0" max="10" value="0" class="slider">
-                <div class="slider-labels">
-                    <span>0h</span>
-                    <span>10h</span>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <div class="dual-inputs">
-                    <div class="dual-left">
-                        <div class="input-header">
-                            <i class="fas fa-utensils header-icon"></i>
-                            <h3>食事回数: <span id="mealValue">0</span>回</h3>
-                        </div>
-                        <div class="meal-buttons">
-                            <button class="meal-button active" data-value="0">0</button>
-                            <button class="meal-button" data-value="1">1</button>
-                            <button class="meal-button" data-value="2">2</button>
-                            <button class="meal-button" data-value="3">3</button>
-                            <button class="meal-button" data-value="4">4</button>
-                            <button class="meal-button" data-value="5">5</button>
-                        </div>
-                    </div>
-                    <div class="dual-right">
-                        <div class="input-header">
-                            <i class="fas fa-pills header-icon"></i>
-                            <h3>常備薬</h3>
-                        </div>
-                        <div class="medicine-buttons">
-                            <button class="medicine-button" data-value="1">YES</button>
-                            <button class="medicine-button active" data-value="0">NO</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <div class="input-header">
-                    <i class="fas fa-running header-icon"></i>
-                    <h3>運動時間: <span id="exerciseValue">0</span>分</h3>
-                </div>
-                <div class="exercise-buttons">
-                    <button class="exercise-button active" data-value="0">0分</button>
-                    <button class="exercise-button" data-value="15">15分</button>
-                    <button class="exercise-button" data-value="30">30分</button>
-                    <button class="exercise-button" data-value="45">45分</button>
-                    <button class="exercise-button" data-value="60">60分</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <script src="./static/js/app.js" defer></script>
-</body>
-</html>
+<main class="app">
+ <section class="signage" aria-label="健康の推移">
+  <header class="topbar"><div><div class="eyebrow">DAILY HEALTH / 自分の変化を見つける</div><h1>自宅健康管理サイネージ</h1></div><div class="metrics"><div>今日の睡眠<strong id="sleep">— <small>未接続</small></strong></div><div>今日の歩数<strong id="steps">— <small>未接続</small></strong></div><button id="export" class="quiet">書き出し</button><button id="import" class="quiet">読み込み</button><input id="import-file" type="file" accept="application/json" hidden></div></header>
+  <article class="card main-chart"><div class="card-heading"><div><h2>状態推移</h2><span id="period" class="muted"></span></div><div class="legend"><span class="blue">● エネルギー</span><span class="green">● 気分</span><span class="purple">● 睡眠時間（右軸）</span></div></div><div class="plot"><canvas id="state-chart" aria-label="直近14日のエネルギー、気分、睡眠時間" role="img"></canvas><div id="empty" class="empty">記録した日から、変化が見えてきます。<small>未入力の日は空白のまま表示します</small></div></div></article>
+  <div class="subcharts"><article class="card"><div class="card-heading"><h2>仕事時間</h2><span class="muted">時間 / 日</span></div><div class="plot"><canvas id="work-chart" aria-label="14日間の仕事時間" role="img"></canvas></div></article><article class="card"><div class="card-heading"><h2>趣味・副業・創作</h2><span class="muted">時間 / 日</span></div><div class="plot"><canvas id="hobby-chart" aria-label="14日間の趣味、副業、創作時間" role="img"></canvas></div></article><article class="card"><div class="card-heading"><h2>モヤモヤと現実対処力</h2></div><div class="small-legend"><span class="orange">● モヤモヤ 0–4</span><span class="blue">● 現実対処力 1–5</span></div><div class="plot"><canvas id="reality-chart" aria-label="14日間のモヤモヤ度と現実対処力" role="img"></canvas></div></article></div>
+  <aside id="support" class="support" aria-live="polite"></aside>
+ </section>
+ <aside class="input-panel" aria-label="日々の入力">
+  <header class="input-title"><h2 id="input-title">今日の入力</h2><span id="save-status" role="status">入力すると自動保存</span></header>
+  <nav class="date-nav" aria-label="入力日"><button id="prev" aria-label="前の日">‹</button><input id="date" type="date" aria-label="入力する日付"><button id="next" aria-label="次の日">›</button><button id="today">今日</button><button id="copy">前日コピー</button></nav>
+  <div id="fields"></div>
+  <footer id="input-note">タップで記録 · 未選択の項目は未入力</footer>
+ </aside>
+</main>
+<script type="module" src="/static/js/app.js"></script>
+</body></html>

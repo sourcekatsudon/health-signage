@@ -1,11 +1,4 @@
 @echo off
-echo === 気分測定サイネージ 起動中 ===
-echo.
-
-REM Activate virtual environment
-call venv\Scripts\activate.bat
-
-REM Start the application
-echo アプリケーションを起動しています...
-echo ブラウザで http://localhost:5001 にアクセスしてください
-python app.py
+cd /d "%~dp0"
+call npm run build
+.venv\Scripts\waitress-serve --host=127.0.0.1 --port=5001 app:app
