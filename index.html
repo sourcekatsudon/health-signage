@@ -4,16 +4,30 @@
 <body>
 <main class="app">
  <section class="signage" aria-label="健康の推移">
-  <header class="topbar"><div><div class="eyebrow">DAILY HEALTH / 自分の変化を見つける</div><h1>自宅健康管理サイネージ</h1></div><div class="metrics"><div>今日の睡眠<strong id="sleep">— <small>未接続</small></strong></div><div>今日の歩数<strong id="steps">— <small>未接続</small></strong></div><button id="export" class="quiet">書き出し</button><button id="import" class="quiet">読み込み</button><input id="import-file" type="file" accept="application/json" hidden></div></header>
-  <article class="card main-chart"><div class="card-heading"><div><h2>状態推移</h2><span id="period" class="muted"></span></div><div class="legend"><span class="blue">● エネルギー</span><span class="green">● 気分</span><span class="purple">● 睡眠時間（右軸）</span></div></div><div class="plot"><canvas id="state-chart" aria-label="直近14日のエネルギー、気分、睡眠時間" role="img"></canvas><div id="empty" class="empty">記録した日から、変化が見えてきます。<small>未入力の日は空白のまま表示します</small></div></div></article>
-  <div class="subcharts"><article class="card"><div class="card-heading"><h2>仕事時間</h2><span class="muted">時間 / 日</span></div><div class="plot"><canvas id="work-chart" aria-label="14日間の仕事時間" role="img"></canvas></div></article><article class="card"><div class="card-heading"><h2>趣味・副業・創作</h2><span class="muted">時間 / 日</span></div><div class="plot"><canvas id="hobby-chart" aria-label="14日間の趣味、副業、創作時間" role="img"></canvas></div></article><article class="card"><div class="card-heading"><h2>モヤモヤと現実対処力</h2></div><div class="small-legend"><span class="orange">● モヤモヤ 0–4</span><span class="blue">● 現実対処力 1–5</span></div><div class="plot"><canvas id="reality-chart" aria-label="14日間のモヤモヤ度と現実対処力" role="img"></canvas></div></article></div>
+  <header class="topbar">
+   <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg></span><div><div class="eyebrow">DAILY HEALTH / 自分の変化を見つける</div><h1>自宅健康管理サイネージ</h1></div></div>
+   <div class="metrics">
+    <div class="metric"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14A8 8 0 0 1 10 4a8 8 0 1 0 10 10Z"/></svg>今日の睡眠<strong id="sleep">— <small>未接続</small></strong></div>
+    <div class="metric"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="8" cy="8" rx="3" ry="5" transform="rotate(-20 8 8)"/><ellipse cx="17" cy="13" rx="3" ry="5" transform="rotate(20 17 13)"/><path d="m6 16 1 3m11 2 1-2"/></svg>今日の歩数<strong id="steps">— <small>未接続</small></strong></div>
+    <button id="export" class="quiet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg>書き出し</button><button id="import" class="quiet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m-4 4 4-4 4 4M5 16v4h14v-4"/></svg>読み込み</button><input id="import-file" type="file" accept="application/json" hidden>
+   </div>
+  </header>
+  <article class="card main-chart">
+   <div class="card-heading"><div class="heading-with-icon"><span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18V6m0 12h16M7 13l4-4 4 3 5-7"/></svg></span><div><div class="chart-kicker">YOUR DAILY RHYTHM</div><h2>状態推移</h2><span id="period" class="muted"></span></div></div><div class="legend"><span class="energy-color">● エネルギー</span><span class="mood-color">● 気分</span><span class="sleep-color">● 睡眠時間（右軸）</span></div></div>
+   <div class="plot"><canvas id="state-chart" aria-label="直近14日のエネルギー、気分、睡眠時間" role="img"></canvas><div id="empty" class="empty"><span class="empty-glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 19v-7m0 3C5 15 4 10 4 6c6 0 8 3 8 7m0-2c0-5 3-7 8-7 0 5-2 8-8 8"/></svg></span><span>記録した日から、変化が見えてきます。</span><small>右のボタンから、今の自分に近いところをひとつ。</small></div></div>
+  </article>
+  <div class="subcharts">
+   <article class="card"><div class="card-heading"><div class="heading-with-icon"><span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M8 7V4h8v3M4 12h16m-10 0v3h4v-3"/></svg></span><h2>仕事時間</h2></div><span class="muted">時間 / 日</span></div><div class="plot"><canvas id="work-chart" aria-label="14日間の仕事時間" role="img"></canvas></div></article>
+   <article class="card"><div class="card-heading"><div class="heading-with-icon"><span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5ZM19 3v4m-2-2h4"/></svg></span><h2>趣味・副業・創作</h2></div><span class="muted">時間 / 日</span></div><div class="plot"><canvas id="hobby-chart" aria-label="14日間の趣味、副業、創作時間" role="img"></canvas></div></article>
+   <article class="card"><div class="card-heading"><div class="heading-with-icon"><span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8c3-5 5 5 8 0s5 5 8 0M4 15c3-5 5 5 8 0s5 5 8 0"/></svg></span><h2>モヤモヤと現実対処力</h2></div></div><div class="small-legend"><span class="orange">● モヤモヤ 0–4</span><span class="blue">● 現実対処力 1–5</span></div><div class="plot"><canvas id="reality-chart" aria-label="14日間のモヤモヤ度と現実対処力" role="img"></canvas></div></article>
+  </div>
   <aside id="support" class="support" aria-live="polite"></aside>
  </section>
  <aside class="input-panel" aria-label="日々の入力">
   <header class="input-title"><h2 id="input-title">今日の入力</h2><span id="save-status" role="status">入力すると自動保存</span></header>
   <nav class="date-nav" aria-label="入力日"><button id="prev" aria-label="前の日">‹</button><input id="date" type="date" aria-label="入力する日付"><button id="next" aria-label="次の日">›</button><button id="today">今日</button><button id="copy">前日コピー</button></nav>
   <div id="fields"></div>
-  <footer id="input-note">タップで記録 · 未選択の項目は未入力</footer>
+  <footer id="input-note"><span id="entry-progress" aria-live="polite">0 / 7 項目</span><span id="progress-dots" class="progress-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span>タップで自動保存</span></footer>
  </aside>
 </main>
 <script type="module" src="/static/js/app.js"></script>

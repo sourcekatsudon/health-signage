@@ -1,6 +1,6 @@
 # Local API
 
-Base: `http://localhost:5001`。JSONのみ。localhostにバインドし、Host/Originを検証。CORSを公開しない。
+Base: `http://192.168.0.64:5000`。JSONのみ。HEALTH_HOSTにバインドし、許可されたHostと同一Originを検証。CORSを公開しない。
 
 ## GET /api/health-log
 

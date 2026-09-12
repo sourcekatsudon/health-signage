@@ -15,6 +15,13 @@ from notion_sync import NotionClient, NotionError
 
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / '.env.local')
+SERVER_HOST = os.getenv('HEALTH_HOST', '127.0.0.1')
+SERVER_PORT = int(os.getenv('HEALTH_PORT', '5000'))
+ALLOWED_HOSTS = {'localhost', '127.0.0.1', '::1'} | {
+    host.strip().lower() for host in os.getenv('HEALTH_ALLOWED_HOSTS', '').split(',') if host.strip()
+}
+if SERVER_HOST not in ('0.0.0.0', '::'):
+    ALLOWED_HOSTS.add(SERVER_HOST.lower())
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 64 * 1024
 DB = os.getenv('HEALTH_DB_PATH', str(ROOT / 'health.db'))
@@ -56,9 +63,9 @@ def validate(data):
     return {k: data[k] for k in ('date', 'updatedAt', *LIMITS) if k in data}
 
 @app.before_request
-def local_only():
-    if request.host.split(':')[0] not in ('127.0.0.1', 'localhost', '[::1]'):
-        return jsonify(error='Local access only'), 403
+def allowed_host_only():
+    if urlsplit('//' + request.host).hostname not in ALLOWED_HOSTS:
+        return jsonify(error='Host not allowed'), 403
     if request.method == 'POST':
         origin = request.headers.get('Origin')
         if origin and urlsplit(origin).netloc != request.host:
@@ -134,4 +141,4 @@ if os.getenv('HEALTH_DISABLE_WORKER') != '1':
     threading.Thread(target=retry_loop, daemon=True, name='notion-outbox').start()
 
 if __name__ == '__main__':
-    app.run(debug=False, host='127.0.0.1', port=5001)
+    app.run(debug=False, host=SERVER_HOST, port=SERVER_PORT)

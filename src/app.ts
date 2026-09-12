@@ -21,7 +21,7 @@ function persist(){try{if(!storageHealthy)throw Error();writeStore(store);return
 function commit(e:Entry){if(!storageHealthy)return;e.updatedAt=new Date(Math.max(Date.now(),revision+1)).toISOString();revision=Date.parse(e.updatedAt);store.entries[e.date]=e;store.pending[e.date]=e.updatedAt;if(persist())sync.schedule();render()}
 function setValue(key:Field,value:number){commit({...current(),[key]:value})}
 for(const key of fields){
- const card=document.createElement('section');card.className='field';card.setAttribute('aria-label',labels[key]);
+ const card=document.createElement('section');card.className='field';card.dataset.key=key;card.setAttribute('aria-label',labels[key]);
  const head=document.createElement('div');head.className='field-label';const label=document.createElement('span');label.textContent=labels[key];head.append(label);const meaning=document.createElement('span');meaning.className='meaning';meaning.id='meaning-'+key;head.append(meaning);card.append(head);
  if(meanings[key]){
   const group=document.createElement('div');group.className='segments';const min=key==='moyamoya'||key==='suicidalThought'?0:1;
@@ -38,6 +38,10 @@ for(const key of fields){
 function render(){
  const e=current();el<HTMLInputElement>('date').value=selected;el<HTMLInputElement>('date').max=today();el<HTMLButtonElement>('next').disabled=selected>=today();el('input-title').textContent=selected===today()?'今日の入力':'過去日の入力';el<HTMLButtonElement>('copy').disabled=!store.entries[shiftDate(selected,-1)];
  for(const key of fields){const v=e[key];if(meanings[key]){const min=key==='moyamoya'||key==='suicidalThought'?0:1;el('meaning-'+key).textContent=v==null?'未入力':meanings[key]![v-min];document.querySelectorAll<HTMLButtonElement>(`button[data-key="${key}"]`).forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.value)===v)))}else{el('value-'+key).textContent=v==null?'—':String(v);el<HTMLInputElement>(key).value=String(v??0);el('meaning-'+key).textContent=v==null?'未入力 · 0〜16時間':'時間 · 0.5時間刻み'}}
+ const count=fields.filter(key=>e[key]!=null).length;
+ el('entry-progress').textContent=`${count} / ${fields.length} 項目`;
+ fields.forEach((key,i)=>{document.querySelector<HTMLElement>(`.field[data-key="${key}"]`)!.dataset.filled=String(e[key]!=null);(el('progress-dots').children[i] as HTMLElement).dataset.filled=String(e[key]!=null)});
+ for(const key of ['workHours','hobbyHours'] as const){el<HTMLInputElement>(key).style.setProperty('--range-fill',`${(e[key]??0)/16*100}%`)}
  drawCharts(store.entries,selected);renderSupport();void renderMetrics();
 }
 function renderSupport(){

@@ -1,6 +1,6 @@
 # 自宅健康管理サイネージ
 
-本人固有の悪化の兆候を継続して観測する、ローカルMac用の計器盤。1920×720、Chrome、タッチ操作、Asia/Tokyo基準。左75%が14日グラフ、右25%が7項目の入力です。
+本人固有の悪化の兆候を継続して観測する、ローカルMac用の計器盤。1920×720、Chrome、タッチ操作、Asia/Tokyo基準。左70%が14日グラフ、右30%が7項目の入力です。
 
 ## 起動
 
@@ -23,9 +23,39 @@ npm run dev
 npm start
 ```
 
-`npm start` はビルド後にWaitressを **127.0.0.1:5001** で起動します。Chromeで **http://localhost:5001** を開き、表示領域1920×720・ズーム100%・全画面表示を使用してください。画面外寸にはChromeのタブやツールバーを含めないでください。`localhost` と `127.0.0.1` はlocalStorageが別なので、普段使うURLを固定します。
+`npm start` はビルド後にWaitressを起動します。待ち受けは `.env.local` の `HEALTH_HOST` / `HEALTH_PORT`（既定値：127.0.0.1 / 5000）で指定します。Chromeで設定したアドレスを開き、表示領域1920×720・ズーム100%・全画面表示を使用してください。画面外寸にはChromeのタブやツールバーを含めないでください。`localhost` と `127.0.0.1` はlocalStorageが別なので、普段使うURLを固定します。
 
 代わりに `./setup.sh`、`./start.sh` でも起動できます。常時起動時はMacの自動スリープを無効化してください。単一ローカルサーバープロセスで運用します（NotionのCREATE競合を防ぐため、複数ワーカー／複数Macからの同時書き込みは非対応）。
+
+## LAN内の別PCから利用する
+
+このMacでは `.env.local` に `HEALTH_HOST=192.168.0.64`、`HEALTH_PORT=5000` を設定しています。同じLANのPCから **http://192.168.0.64:5000** を開いてください。`localhost` は閲覧しているPC自身を指すため、別PCでは使いません。
+
+`HEALTH_HOST` に指定したアドレスはHost検証でも許可されます。追加のホスト名は `HEALTH_ALLOWED_HOSTS` にカンマ区切りで指定できます。異なるOriginからの書き込みは拒否します。AirPlayの5000番と共存するため、LANのIPアドレスに限定して待ち受けます。
+
+MacのLANアドレスが変わった場合は `HEALTH_HOST` を更新してサーバーを再起動してください。手動起動は `npm start`、終了はControl+Cです。常駐運用中の再起動は `npm run service:restart` です。入力済みのSQLiteデータとNotion設定は引き継ぎます。複数PC・複数タブでの同時編集は避けてください。
+
+## macOSで常駐させる
+
+本体は `~/Applications/health-signage` に置きます。Desktop配下はmacOSのバックグラウンドアクセス制限を受けるため、LaunchAgentから直接実行しません。このMacでは元の `~/Desktop/work/health-signage` から本体へのシンボリックリンクを作成しています。
+
+手動起動中のサーバーを終了してから、次を実行します。
+
+```bash
+npm run service:install
+```
+
+ログイン時に自動起動し、プロセス終了時はlaunchdが再起動します。管理者権限は不要です。ログアウト中・Macのスリープ中は利用できません。常駐中は、同じポートで `npm start` や `npm run dev` を重ねて実行しないでください。
+
+```bash
+npm run service:status     # 稼働状況
+npm run service:restart    # Notion設定やPythonの変更を反映
+npm run service:stop       # 一時停止（次回ログイン時は自動起動）
+npm run service:start      # 一時停止から再開
+npm run service:uninstall  # 自動起動を解除（記録・設定は保持）
+```
+
+フロント変更は `npm run build` 後にブラウザを再読み込みします。配置先を変更した場合は `npm run service:install` を再実行してください。設定ファイルは `~/Library/LaunchAgents/local.health-signage.plist`、ログは `~/Library/Logs/health-signage/server.log` にあります。Notion Secretや健康記録はGitへ追加しません。
 
 ## Notionの手動設定
 
@@ -106,9 +136,9 @@ npm run build
 npm test
 ```
 
-TypeScript型検査、フロント10テスト、Python7テストが成功。判定の境界、全3,125通りの評価組合せに対する候補の決定性と安全性、14日の日付境界、旧データ保持、通信中の追加入力、同日upsert、オフライン再送、入力検証、Secretファイル非公開を確認しています。
+TypeScript型検査、フロント10テスト、Python8テストが成功。判定の境界、全3,125通りの評価組合せに対する候補の決定性と安全性、14日の日付境界、旧データ保持、通信中の追加入力、同日upsert、オフライン再送、入力検証、Secretファイル非公開を確認しています。
 
-実NotionのCREATE／UPDATEは検証済み。未検証：1920×720のChrome実画面・スクロール／タッチ操作。Chrome操作接続が必要です。CSSは1920×720向けに固定配分で設計済みですが、実測確認と区別しています。
+1920×720と1366×768のChrome実画面で、表示のはみ出し、選択状態、過去日切替、キーボード操作、注意表示を確認済みです。動きを減らす設定とボタンの文字コントラストも確認しています。実機のタッチパネル操作は未検証です。Notionの接続とスキーマは確認済みです。
 
 ## 変更ファイル
 

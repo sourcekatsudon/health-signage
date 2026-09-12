@@ -46,6 +46,14 @@ class ApiTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
         self.assertEqual(self.client.get('/.env.local').status_code, 404)
         self.assertEqual(self.client.get('/api/generate-dummy').status_code, 404)
+    def test_configured_lan_host_and_origin(self):
+        lan = 'http://192.168.0.64:5000'
+        with patch.object(server, 'ALLOWED_HOSTS', {'localhost', '192.168.0.64'}):
+            self.assertEqual(self.client.get('/api/health-log', base_url=lan).status_code, 200)
+            self.assertEqual(self.client.get('/api/health-log', base_url='http://untrusted.example:5000').status_code, 403)
+            with patch.object(server.notion, 'upsert', side_effect=NotionError('offline')):
+                self.assertEqual(self.client.post('/api/health-log', base_url=lan, json=self.entry, headers={'Origin': lan}).status_code, 200)
+            self.assertEqual(self.client.post('/api/health-log', base_url=lan, json=self.entry, headers={'Origin': 'http://untrusted.example:5000'}).status_code, 403)
 
 class NotionTests(unittest.TestCase):
     def setUp(self):

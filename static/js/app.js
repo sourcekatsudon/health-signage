@@ -14617,12 +14617,12 @@ var charts = [];
 function drawCharts(entries, end) {
   const dates = datesFor(end), labels2 = dates.map((d) => `${Number(d.slice(5, 7))}/${Number(d.slice(8))}`);
   const data = (key) => dates.map((d) => entries[d]?.[key] ?? null);
-  const series = (label, key, color2, axis = "y") => ({ label, data: data(key), borderColor: color2, backgroundColor: color2 + "65", yAxisID: axis, borderWidth: 2, pointRadius: 3, pointHoverRadius: 6, spanGaps: false });
+  const series = (label, key, color2, axis = "y") => ({ label, data: data(key), borderColor: color2, backgroundColor: color2 + "b3", yAxisID: axis, borderWidth: 2.5, pointRadius: 3.5, pointHoverRadius: 6, pointBorderColor: "#fff", pointBorderWidth: 2, pointBackgroundColor: color2, spanGaps: false });
   const configs = [
-    { id: "state-chart", type: "line", datasets: [series("\u30A8\u30CD\u30EB\u30AE\u30FC", "energy", "#4a83e7"), series("\u6C17\u5206", "mood", "#36a58a"), series("\u7761\u7720\u6642\u9593", "sleepHours", "#9982c6", "sleep")], max: 5, min: 1, sleep: true },
-    { id: "work-chart", type: "bar", datasets: [series("\u4ED5\u4E8B\u6642\u9593", "workHours", "#6b97db")], max: 16, min: 0 },
-    { id: "hobby-chart", type: "bar", datasets: [series("\u8DA3\u5473\u30FB\u526F\u696D\u30FB\u5275\u4F5C", "hobbyHours", "#56ad96")], max: 16, min: 0 },
-    { id: "reality-chart", type: "line", datasets: [series("\u30E2\u30E4\u30E2\u30E4", "moyamoya", "#d99a50"), series("\u73FE\u5B9F\u5BFE\u51E6\u529B", "realityHandling", "#4a83e7")], max: 5, min: 0 }
+    { id: "state-chart", type: "line", datasets: [series("\u30A8\u30CD\u30EB\u30AE\u30FC", "energy", "#276d60"), series("\u6C17\u5206", "mood", "#685384"), series("\u7761\u7720\u6642\u9593", "sleepHours", "#82562c", "sleep")], max: 5, min: 1, sleep: true },
+    { id: "work-chart", type: "bar", datasets: [series("\u4ED5\u4E8B\u6642\u9593", "workHours", "#276d60")], max: 16, min: 0 },
+    { id: "hobby-chart", type: "bar", datasets: [series("\u8DA3\u5473\u30FB\u526F\u696D\u30FB\u5275\u4F5C", "hobbyHours", "#685384")], max: 16, min: 0 },
+    { id: "reality-chart", type: "line", datasets: [series("\u30E2\u30E4\u30E2\u30E4", "moyamoya", "#82562c"), series("\u73FE\u5B9F\u5BFE\u51E6\u529B", "realityHandling", "#315f76")], max: 5, min: 0 }
   ];
   for (const [i, c] of configs.entries()) {
     if (charts[i]) {
@@ -14631,7 +14631,7 @@ function drawCharts(entries, end) {
       charts[i].update("none");
       continue;
     }
-    charts[i] = new auto_default(document.getElementById(c.id), { type: c.type, data: { labels: labels2, datasets: [...c.datasets] }, options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { intersect: false, mode: "index" }, plugins: { legend: { display: false }, tooltip: { enabled: true } }, scales: { x: { grid: { display: false }, ticks: { color: "#919cad", font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: i === 0 ? 14 : 7 } }, y: { min: c.min, max: c.max, border: { display: false }, ticks: { stepSize: i === 1 || i === 2 ? 4 : 1, color: "#919cad", font: { size: 10 } }, grid: { color: "#f0f2f7" } }, ..."sleep" in c ? { sleep: { position: "right", min: 0, max: 16, grid: { drawOnChartArea: false }, ticks: { stepSize: 4, color: "#9982c6", callback: (v) => v + "h" } } } : {} } } });
+    charts[i] = new auto_default(document.getElementById(c.id), { type: c.type, data: { labels: labels2, datasets: [...c.datasets] }, options: { responsive: true, maintainAspectRatio: false, animation: false, elements: { bar: { borderRadius: 5, borderSkipped: false } }, interaction: { intersect: false, mode: "index" }, plugins: { legend: { display: false }, tooltip: { enabled: true, backgroundColor: "#233d3c", padding: 12, cornerRadius: 12, titleColor: "#f2f5e8", bodyColor: "#edf3e8", displayColors: true } }, scales: { x: { grid: { display: false }, ticks: { color: "#68796e", font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: i === 0 ? 14 : 7 } }, y: { min: c.min, max: c.max, border: { display: false }, ticks: { stepSize: i === 1 || i === 2 ? 4 : 1, color: "#68796e", font: { size: 10 } }, grid: { color: "#eaf0e7" } }, ..."sleep" in c ? { sleep: { position: "right", min: 0, max: 16, grid: { drawOnChartArea: false }, ticks: { stepSize: 4, color: "#82562c", callback: (v) => v + "h" } } } : {} } } });
   }
   document.getElementById("period").textContent = `${dates[0].replaceAll("-", "/")} \u2014 ${end.replaceAll("-", "/")} \xB7 14\u65E5\u9593`;
   document.getElementById("empty").hidden = dates.some((d) => ["energy", "mood", "sleepHours"].some((k) => entries[d]?.[k] != null));
@@ -14688,6 +14688,7 @@ function setValue(key, value) {
 for (const key of fields) {
   const card = document.createElement("section");
   card.className = "field";
+  card.dataset.key = key;
   card.setAttribute("aria-label", labels[key]);
   const head = document.createElement("div");
   head.className = "field-label";
@@ -14762,6 +14763,15 @@ function render() {
       el(key).value = String(v ?? 0);
       el("meaning-" + key).textContent = v == null ? "\u672A\u5165\u529B \xB7 0\u301C16\u6642\u9593" : "\u6642\u9593 \xB7 0.5\u6642\u9593\u523B\u307F";
     }
+  }
+  const count = fields.filter((key) => e[key] != null).length;
+  el("entry-progress").textContent = `${count} / ${fields.length} \u9805\u76EE`;
+  fields.forEach((key, i) => {
+    document.querySelector(`.field[data-key="${key}"]`).dataset.filled = String(e[key] != null);
+    el("progress-dots").children[i].dataset.filled = String(e[key] != null);
+  });
+  for (const key of ["workHours", "hobbyHours"]) {
+    el(key).style.setProperty("--range-fill", `${(e[key] ?? 0) / 16 * 100}%`);
   }
   drawCharts(store.entries, selected);
   renderSupport();
