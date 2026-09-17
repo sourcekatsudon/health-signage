@@ -2,7 +2,7 @@ export const fields = ['energy','mood','suicidalThought','moyamoya','realityHand
 export type Field = typeof fields[number];
 export type Metric = Field | 'sleepHours' | 'steps';
 export type Entry = {date:string; updatedAt:string} & Partial<Record<Metric,number|null>>;
-export const today = () => new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+export const today = () => new Date(Date.now()+9*60*60*1000).toISOString().slice(0,10);
 export const shiftDate = (date:string,n:number) => new Date(Date.parse(date+'T12:00:00Z')+n*86400000).toISOString().slice(0,10);
 export const datesFor = (date:string) => Array.from({length:14},(_,i)=>shiftDate(date,i-13));
 export const limits:Record<Metric,[number,number,number]> = {energy:[1,5,1],mood:[1,5,1],suicidalThought:[0,4,1],moyamoya:[0,4,1],realityHandling:[1,5,1],workHours:[0,16,.5],hobbyHours:[0,16,.5],sleepHours:[0,24,.01],steps:[0,200000,1]};

@@ -1,3 +1,5 @@
+import './compat';
+import {readFileText} from './compat';
 import {fields,today,shiftDate,validEntry,type Entry,type Field} from './model';
 import {assess} from './state';
 import {selectSuggestions} from './suggestions';
@@ -5,7 +7,9 @@ import {readStore,writeStore,type Store} from './storage';
 import {SyncQueue} from './sync';
 import {syncConfig} from './config';
 import {LocalHealthMetricsProvider} from './provider';
-import {drawCharts} from './charts';
+import {drawCharts,resizeCharts} from './charts';
+import {setupFullscreen} from './fullscreen';
+import {setupDisplayMode} from './display-mode';
 const el=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const labels:Record<Field,string>={energy:'エネルギー / 回復感',mood:'気分 / 興味',suicidalThought:'死にたい気持ち',moyamoya:'モヤモヤ度',realityHandling:'現実対処力',workHours:'仕事時間',hobbyHours:'趣味・副業・創作時間'};
 const meanings:Partial<Record<Field,string[]>>={energy:['かなり低い・動けない','疲れている','普通','まあ元気','よく寝た・エネルギー高'],mood:['かなり落ち込む','悪い','普通','良い','クリエイティブ・楽しい'],suicidalThought:['なし','少しちらつく','そこそこある','強い','非常に強い'],moyamoya:['なし','少し','気になる','強い','かなり強い・身動きが取りづらい'],realityHandling:['分かっている問題にもほぼ着手できない','メール返信・電話・タスクを避け始めている','後回しが増えている','面倒だが対応できる','面倒な問題でも普通に処理できる']};
@@ -46,7 +50,7 @@ function render(){
 }
 function renderSupport(){
  // Today's safety message stays visible while editing historical records.
- const actual=store.entries[today()];const e=actual??{date:today(),updatedAt:new Date().toISOString()};const state=assess(e),box=el('support');box.replaceChildren();box.className='support';const title=document.createElement('strong'),body=document.createElement('p');box.append(title,body);
+ const actual=store.entries[today()];const e=actual??{date:today(),updatedAt:new Date().toISOString()};const state=assess(e),box=el('support');box.textContent='';box.className='support';const title=document.createElement('strong'),body=document.createElement('p');box.append(title,body);
  if(state.high){box.classList.add('high');title.textContent='今日は、一人で抱えない日';body.textContent='誰か一人に連絡して、今の状態をそのまま伝える。具体的な方法を考え始めているなら、人・医療・緊急支援につなぐ。'}
  else if(state.declining){box.classList.add('warning');title.textContent=state.watch?'今日は誰かとつながって':'調子が崩れてきている';body.textContent='今日の候補： '+selectSuggestions(e).map(s=>s.text).join(' / ')}
  else if(state.watch){box.classList.add('warning');title.textContent='少し、気にかけておく日';body.textContent='今の気持ちを、一人で抱えず誰かに伝えてもいい。'}
@@ -58,8 +62,8 @@ el('prev').onclick=()=>{selected=shiftDate(selected,-1);render()};el('next').onc
 el('copy').onclick=()=>{const previous=store.entries[shiftDate(selected,-1)];if(previous){const e={...current()};fields.forEach(k=>e[k]=previous[k]??null);commit(e)}};
 el('export').onclick=()=>{const blob=new Blob([JSON.stringify({version:2,entries:store.entries,legacy:JSON.parse(localStorage.getItem('moodSignageEntries')||'null')},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='health-'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 el('import').onclick=()=>el<HTMLInputElement>('import-file').click();
-el<HTMLInputElement>('import-file').onchange=async()=>{try{const file=el<HTMLInputElement>('import-file').files?.[0];if(!file)return;const parsed=JSON.parse(await file.text());const records=Object.values(parsed.entries??parsed);if(!records.length||!records.every(validEntry)||records.some(e=>(e as Entry).date>today()))throw Error();for(const e of records as Entry[]){if(!store.entries[e.date]||e.updatedAt>store.entries[e.date].updatedAt){store.entries[e.date]=e;store.pending[e.date]=e.updatedAt}}if(persist()){sync.schedule();render()}}catch{status('読み込み失敗：v2 JSON形式を確認')}finally{el<HTMLInputElement>('import-file').value=''}};
+el<HTMLInputElement>('import-file').onchange=async()=>{try{const file=el<HTMLInputElement>('import-file').files?.[0];if(!file)return;const parsed=JSON.parse(await readFileText(file));const records=Object.values(parsed.entries??parsed);if(!records.length||!records.every(validEntry)||records.some(e=>(e as Entry).date>today()))throw Error();for(const e of records as Entry[]){if(!store.entries[e.date]||e.updatedAt>store.entries[e.date].updatedAt){store.entries[e.date]=e;store.pending[e.date]=e.updatedAt}}if(persist()){sync.schedule();render()}}catch{status('読み込み失敗：v2 JSON形式を確認')}finally{el<HTMLInputElement>('import-file').value=''}};
 async function hydrate(){try{const response=await fetch('/api/health-log');if(!response.ok)throw Error();const data=await response.json();for(const e of data.entries as Entry[]){if(!validEntry(e))continue;const local=store.entries[e.date];if(!local||e.updatedAt>=local.updatedAt){store.entries[e.date]=e;if(data.pending.includes(e.date))store.pending[e.date]=e.updatedAt;else delete store.pending[e.date]}}if(persist()){render();if(Object.keys(store.pending).length)void sync.flush();else status(data.notionConfigured?'保存済':'ローカル保存 / Notion未設定')}}catch{status('ローカル表示 / サーバー未接続')}}
-render();void hydrate();
+setupDisplayMode(resizeCharts);setupFullscreen();render();void hydrate();
 window.addEventListener('online',()=>void sync.flush());
 setInterval(()=>{const now=today();if(now!==lastToday){if(selected===lastToday)selected=now;lastToday=now;render()}if(Object.keys(store.pending).length)void sync.flush()},syncConfig.retryMs);

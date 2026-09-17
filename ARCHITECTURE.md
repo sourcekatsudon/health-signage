@@ -3,7 +3,7 @@
 FlaskとChart.jsを継続使用。フロントはフレームワークを追加せずTypeScriptへ分割し、esbuildでローカル配信する。CDN依存なし。
 
 ```text
-1920×720 Chrome
+1920×620 Chrome
   ├─ src/app.ts → charts.ts / state.ts / suggestions.ts
   ├─ provider.ts (sleep/steps)
   └─ storage.ts → localStorage + persistent pending revisions

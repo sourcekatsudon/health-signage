@@ -1,3 +1,4 @@
+import {fetchWithTimeout} from './request';
 import type {Store} from './storage';
 import {writeStore} from './storage';
 import {syncConfig} from './config';
@@ -11,7 +12,7 @@ export class SyncQueue {
    for(const [date,revision] of Object.entries(this.store.pending)) {
     try {
      const entry=this.store.entries[date];
-     const response=await fetch('/api/health-log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry),signal:AbortSignal.timeout(20000)});
+     const response=await fetchWithTimeout('/api/health-log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)});
      if(!response.ok)throw Error('local server');
      const result=await response.json();
      if(!result.synced)throw Error('Notion');

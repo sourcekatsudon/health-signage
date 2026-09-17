@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc --noEmit && esbuild src/app.ts --bundle --format=esm --outfile=static/js/app.js",
+    "build": "tsc --noEmit && esbuild src/app.ts --bundle --format=iife --target=chrome53 --outfile=static/js/app.js",
     "dev": "npm run build && .venv/bin/python app.py",
     "start": "npm run build && .venv/bin/python serve_local.py",
     "test": "tsx --test tests/*.test.ts && .venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
@@ -15,12 +15,14 @@
     "service:uninstall": ".venv/bin/python scripts/service.py uninstall"
   },
   "dependencies": {
-    "chart.js": "^4.4.0"
+    "chart.js": "^4.4.0",
+    "core-js": "^3.50.0",
+    "resize-observer-polyfill": "^1.5.1"
   },
   "devDependencies": {
-    "typescript": "^5.9.0",
+    "@types/node": "^24.0.0",
     "esbuild": "^0.25.0",
     "tsx": "^4.20.0",
-    "@types/node": "^24.0.0"
+    "typescript": "^5.9.0"
   }
 }
