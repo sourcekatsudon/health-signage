@@ -1,0 +1,12 @@
+health.db*
+mood.db
+.env
+.env.*
+!.env.example
+.venv
+node_modules
+__pycache__
+*.sqlite*
+*.db
+*.db-*
+artifacts

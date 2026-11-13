@@ -164,3 +164,68 @@ html.legacy-layout[data-display-mode=portrait] .field+.field{margin-top:5px}
 html.legacy-layout[data-display-mode=portrait] .field-label{height:18px;margin-bottom:1px}
 html.legacy-layout[data-display-mode=portrait] .date-nav,html.legacy-layout[data-display-mode=portrait] .date-nav input{height:48px}
 html.legacy-layout[data-display-mode=portrait] .date-nav button{min-height:48px}
+
+/* iPad Pro 12.9-inch responsive layout (1024x1366 portrait / 1366x1024 landscape).
+   Overrides the old 1920x620 kiosk and 90-degree rotation assumptions.
+   Legacy WebView geometry remains untouched. */
+@supports (display:grid) {
+  @media (min-width: 768px) and (min-height: 768px) {
+    html:not(.legacy-layout), html:not(.legacy-layout) body {min-height:100%;height:auto;overflow:auto}
+    html:not(.legacy-layout) .app,
+    html:not(.legacy-layout)[data-display-mode=portrait] .app {
+      position:relative;left:auto;top:auto;width:100%;height:auto;min-height:100dvh;
+      transform:none;transform-origin:initial;max-width:1600px;margin:0 auto;
+      padding:calc(18px + env(safe-area-inset-top)) calc(18px + env(safe-area-inset-right))
+        calc(18px + env(safe-area-inset-bottom)) calc(18px + env(safe-area-inset-left));
+      display:grid;gap:16px;align-items:start;
+    }
+    html:not(.legacy-layout) .signage,
+    html:not(.legacy-layout)[data-display-mode=portrait] .signage {
+      padding:0;min-width:0;display:grid;grid-template-rows:auto auto auto auto;
+      gap:14px;height:auto;
+    }
+    html:not(.legacy-layout) .topbar {height:auto;min-height:70px;flex-wrap:wrap;gap:12px}
+    html:not(.legacy-layout) .metrics {flex-wrap:wrap;gap:8px}
+    html:not(.legacy-layout) .card {min-width:0}
+    html:not(.legacy-layout) .main-chart {height:300px;min-height:0}
+    html:not(.legacy-layout) .subcharts {height:230px;min-height:0;gap:12px}
+    html:not(.legacy-layout) .support {min-height:74px;height:auto}
+    html:not(.legacy-layout) .input-panel,
+    html:not(.legacy-layout)[data-display-mode=portrait] .input-panel {
+      position:relative;width:100%;height:auto;min-width:0;max-height:none;overflow:visible;
+      padding:16px;gap:12px;border-radius:22px;
+    }
+    html:not(.legacy-layout) #fields,
+    html:not(.legacy-layout)[data-display-mode=portrait] #fields {
+      display:grid;grid-template-rows:repeat(7,minmax(76px,auto));gap:8px;
+      flex:none;min-height:0;
+    }
+    html:not(.legacy-layout) .field {padding:7px 12px;border-radius:14px}
+    html:not(.legacy-layout) .field-label {height:auto;min-height:19px;margin-bottom:5px;font-size:13px}
+    html:not(.legacy-layout) .field-label .meaning {font-size:11px}
+    html:not(.legacy-layout) .segments button {min-height:48px;height:48px;font-size:19px}
+    html:not(.legacy-layout) .segments button small {font-size:10px}
+    html:not(.legacy-layout) .hours button {min-height:48px;min-width:48px}
+    html:not(.legacy-layout) .hours input {height:48px}
+    html:not(.legacy-layout) .hours input::-webkit-slider-thumb {width:32px;height:32px;margin-top:-13px}
+    html:not(.legacy-layout) .date-nav,html:not(.legacy-layout) .date-nav input {min-height:48px;height:48px}
+    html:not(.legacy-layout) .date-nav button {min-height:48px}
+    html:not(.legacy-layout) .input-panel footer {height:auto;min-height:28px;font-size:11px}
+    html:not(.legacy-layout) button {touch-action:manipulation}
+    html:not(.legacy-layout) .display-mode button {min-height:44px;min-width:44px}
+  }
+  @media (min-width:1100px) and (min-height:768px) {
+    html:not(.legacy-layout) .app,html:not(.legacy-layout)[data-display-mode=portrait] .app {
+      grid-template-columns:minmax(0,1.6fr) minmax(410px,1fr);
+    }
+    html:not(.legacy-layout) .main-chart {height:350px}
+    html:not(.legacy-layout) .subcharts {height:245px}
+  }
+  @media (min-width:768px) and (max-width:1099px) and (min-height:768px) {
+    html:not(.legacy-layout) .app,html:not(.legacy-layout)[data-display-mode=portrait] .app {
+      grid-template-columns:minmax(0,1fr);
+    }
+    html:not(.legacy-layout) .main-chart {height:330px}
+    html:not(.legacy-layout) .subcharts {height:240px}
+  }
+}
