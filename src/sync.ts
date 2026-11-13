@@ -13,13 +13,13 @@ export class SyncQueue {
     try {
      const entry=this.store.entries[date];
      const response=await fetchWithTimeout('/api/health-log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)});
-     if(!response.ok)throw Error('local server');
+     if(!response.ok)throw Error('cloud API');
      const result=await response.json();
      if(!result.synced)throw Error('Notion');
      if(this.store.pending[date]===revision){delete this.store.pending[date];writeStore(this.store)}
     }catch{failed=true}
    }
-   this.status(failed?'ローカル保存済 / Notion未同期':Object.keys(this.store.pending).length?'保存中…':'保存済');
+   this.status(failed?'端末保存済 / Notion未同期':Object.keys(this.store.pending).length?'保存中…':'保存済');
   }finally{this.running=false}
  }
 }
