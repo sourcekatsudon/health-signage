@@ -1,7 +1,7 @@
 export function displayGeometry(width: number, height: number, portrait: boolean, legacy: boolean) {
   const rotated = portrait && width > height;
-  const logicalWidth = portrait ? 640 : legacy ? 1920 : width;
-  const logicalHeight = portrait ? 1920 : legacy ? 640 : height;
+  const logicalWidth = portrait ? (legacy ? 640 : Math.min(width, height)) : legacy ? 1920 : width;
+  const logicalHeight = portrait ? (legacy ? 1920 : Math.max(width, height)) : legacy ? 640 : height;
   const scale = Math.min(width / (rotated ? logicalHeight : logicalWidth), height / (rotated ? logicalWidth : logicalHeight));
   const left = (width - (rotated ? logicalHeight : logicalWidth) * scale) / 2;
   const top = (height - (rotated ? logicalWidth : logicalHeight) * scale) / 2 + (rotated ? logicalWidth * scale : 0);
@@ -25,8 +25,13 @@ export function setupDisplayMode(onLayout: () => void = () => {}): void {
   const legacy = probe.scrollHeight !== 1 || !CSS.supports('display', 'grid');
   probe.parentNode!.removeChild(probe);
   if (legacy) document.documentElement.classList.add('legacy-layout');
-  let mode: 'landscape' | 'portrait' = 'landscape';
+  let mode: 'landscape' | 'portrait' = window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
   function resize(): void {
+    if (!legacy) {
+      app.style.cssText = '';
+      requestAnimationFrame(onLayout);
+      return;
+    }
     const geometry = displayGeometry(window.innerWidth, window.innerHeight, mode === 'portrait', legacy);
     app.style.position = 'absolute';
     app.style.width = geometry.width + 'px';
@@ -40,9 +45,9 @@ export function setupDisplayMode(onLayout: () => void = () => {}): void {
   function apply(value: 'landscape' | 'portrait'): void {
     mode = value;
     document.documentElement.dataset.displayMode = mode;
-    // Move the real controls; CSS order alone leaves legacy WebViews and focus order behind.
-    if (mode === 'portrait') signage.insertBefore(inputPanel, mainChart);
-    else app.appendChild(inputPanel);
+    // Keep DOM structure stable; modern iPad layouts are handled by CSS grid.
+    if (legacy && mode === 'portrait') signage.insertBefore(inputPanel, mainChart);
+    else if (legacy) app.appendChild(inputPanel);
     landscape.setAttribute('aria-pressed', String(mode === 'landscape'));
     portrait.setAttribute('aria-pressed', String(mode === 'portrait'));
     resize();
